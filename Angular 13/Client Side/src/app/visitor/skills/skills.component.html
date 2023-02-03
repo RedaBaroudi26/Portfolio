@@ -1,0 +1,65 @@
+<!--================ Start Banner Area =================-->
+<section class="banner_area mb-3" data-aos="fade-down">
+    <div class="banner_inner d-flex align-items-center">
+        <div class="container">
+            <div class="banner_content text-center">
+                <h2>Skills</h2>
+                <div class="page_link">
+                    <a href="javascript:void(0)" [routerLink]="['/visitor/home']">Home</a>
+                    <a href="javascript:void(0)">Skills</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--================ End Banner Area =================-->
+
+<div class="container">
+    <div class="blog_version" data-aos="zoom-in" data-aos-duration="1000">
+        <div class="whole-wrap">
+            <div class="section-top-border">
+                <h3 class="mb-30 title_color">Language And FrameWork</h3>
+                <div *ngIf="skills$ | async as skills">
+
+                    <div class="progress-table-wrap" *ngIf="skills.length != 0 ">
+
+                        <div class="progress-table">
+
+                            <div class="table-head" >
+                                <div class="serial">#</div>
+                                <div class="country ml-3">Logo</div>
+                                <div class="visit">Name</div>
+                                <div class="percentage">Percentage</div>
+                            </div>
+
+                            <div class="table-row" *ngFor="let skill of skills ; let i = index  ">
+                                <div class="serial"> {{ i + 1 }} </div>
+                                <div class="country ml-1"> <img [src]="getImage(skill.idSkill , skill.image.idImage)"
+                                        alt="flag"></div>
+                                <div class="visit"> {{ skill.skillName }} </div>
+                                <div class="percentage">
+                                    <div class="progress">
+                                        <div class="progress-bar color-4" role="progressbar"
+                                            [ngStyle]=" {'width' : skill.percentage+'%'}"
+                                            [attr.aria-valuenow]="skill.percentage" aria-valuemin="0"
+                                            aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                    <h1 style="text-align:center;" class="pt-5 mt-5" *ngIf="skills.length == 0"> No Skills Founds </h1>
+                    <div [hidden]="loading" style="text-align:center;" class="pt-5 mt-5">
+                        <div class="lds-dual-ring"> </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,151 @@
+<main id="main" class="main">
+    <div class="pagetitle">
+       <h1> Category Page</h1>
+       <nav>
+          <ol class="breadcrumb">
+             <li class="breadcrumb-item"><a routerLink="/admin/dashboard">admin</a></li>
+             <li class="breadcrumb-item">Categories</li>
+          </ol>
+       </nav>
+    </div>
+    <section class="section">
+       <div class="row">
+          <div class="col-lg-12">
+            
+            <div class="card pt-4 pb-3">
+                <div class="card-body">
+                   
+                    <ul class="nav nav-tabs d-flex" id="myTabjustified" role="tablist">
+                      <li class="nav-item flex-fill" role="presentation"> <button class="nav-link w-100 active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-justified" type="button" role="tab" aria-controls="home" aria-selected="true"> all Categories </button></li>
+                      <li class="nav-item flex-fill" role="presentation"> <button class="nav-link w-100" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-justified" type="button" role="tab" aria-controls="profile" aria-selected="false"> Add Category </button></li>
+                   </ul>
+
+                   <div class="tab-content pt-2" id="myTabjustifiedContent">
+
+                      <div class="tab-pane fade show active mt-4" id="home-justified" role="tabpanel" aria-labelledby="home-tab"  > 
+
+                        <div [hidden]="loading">
+                           <div class="d-flex justify-content-center">
+                              <div class="spinner-border text-info" role="status"></div>
+                           </div>
+                        </div>
+
+                        <div *ngIf="categories | async as categories" >
+
+                        <table *ngIf="categories.totalElements > 0 " >
+                            <thead>
+                               <tr>
+                                  <th scope="col"> # </th>
+                                  <th scope="col"> Category Name </th>
+                                  <th scope="col"> Option </th>
+                               </tr>
+                            </thead>
+                            <tbody>
+                               <tr *ngFor="let category of categories.content" >
+                                  <td data-label="id"> {{ category.idCategory }} </td>
+                                  <td data-label="categoryName"> {{ category.categoryName }} </td>
+                                  <td data-label="Option"> 
+                                    <button class="btn btn-primary btn-sm mx-3" data-bs-toggle="modal" data-bs-target="#editCategory" (click)="buttonClick(category)" > Edit </button> 
+                                    <button class="btn btn-danger  btn-sm " data-bs-toggle="modal" data-bs-target="#deleteCategory"  (click)="buttonClick(category)" > Delete </button> 
+                                  </td>
+                               </tr>
+                            </tbody>
+                         </table>
+
+                         <nav *ngIf="categories.totalPages > 1" class="mt-4" aria-label="Page navigation example">
+                           <ul class="pagination justify-content-center">
+                             
+                              <li class="page-item" [ngClass]="categories.number == 0 ? 'disabled' : '' " >
+                               <a class="page-link" href="javascript:void(0)" (click)="getAllCategories(categories.number - 1)" >Previous</a>
+                             </li>
+                            
+                             <li class="page-item" *ngFor="let number of counterNumber(categories.totalPages) ; let i = index " [ngClass]="categories.number == i ? 'active' : '' " ><a class="page-link" href="javascript:void(0)" (click)="getAllCategories( i )" > {{ i + 1 }} </a></li>
+                            
+                             <li class="page-item" [ngClass]="categories.number == ( categories.totalPages - 1 ) ? 'disabled' : '' " >
+                               <a class="page-link" href="javascript:void(0)" (click)="getAllCategories(categories.number + 1)" >Next</a>
+                             </li>
+                           </ul>
+                         </nav>
+
+                         <div class="d-flex justify-content-center mt-5 mb-3" *ngIf="categories.totalElements == 0" > <h1> No Categories Found </h1> </div>
+
+                      </div>
+
+                     </div>
+
+                     <div class="tab-pane fade mt-4" id="profile-justified" role="tabpanel" aria-labelledby="profile-tab"> 
+                       
+                        <form [formGroup]="categoryForm" (ngSubmit)="addCategory()" >
+                            <div class="row mb-3">
+                                <label for="categoryName" class="col-sm-2 col-form-label"  >Category Name : </label>
+                                <div class="col-sm-10"> <input type="text" class="form-control" id="categoryName" formControlName="categoryName"  ></div>
+                             </div>
+                             <div class="my-3 error" > <span> {{ messageError }} </span> </div>
+                             <button [hidden]="loading" class="btn btn-outline-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" 
+                              role="status" aria-hidden="true">
+                              </span> <span class="visually-hidden">Loading...</span> </button>
+                             <button [hidden]="!loading" typr="submit" class="btn btn-outline-primary" [disabled]="categoryForm.invalid" > add Category </button>
+                        </form>
+
+                      </div>
+
+                   </div>
+
+                </div>
+             </div>
+
+          </div>
+       </div>
+    </section>
+ </main>
+
+ <div class="modal fade" id="editCategory" tabindex="-1">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title"> Edit Catgeory</h5>
+             <button type="button" id="closeModalUpdate" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body"> 
+            <form>
+                <div>
+                    <label for="categoryName" class="form-label" > Category Name : </label>
+                    <div>
+                         <input type="text" class="form-control" id="categoryName" name="categoryName" [(ngModel)]="selectedCategory.categoryName" >
+                    </div>
+                 </div>
+                <div *ngIf="messageError" class="my-3 error" > <span> {{ messageError }} </span> </div> 
+            </form>
+          </div>
+          <div class="modal-footer"> 
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> 
+            <button [hidden]="loading" class="btn btn-outline-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" 
+               role="status" aria-hidden="true">
+               </span> <span class="visually-hidden">Loading...</span> </button>
+            <button [hidden]="!loading" type="button" class="btn btn-primary" (click)="updateCategory()"  > Save changes </button>
+          </div>
+       </div>
+    </div>
+ </div>
+
+ <div class="modal fade" id="deleteCategory" tabindex="-1">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title"> Delete Catgeory</h5>
+             <button type="button" id="closeModalDelete" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body"> 
+            <div> are you sure you want delete this category : {{ selectedCategory.categoryName }}  </div>
+            <div *ngIf="messageError"> <span class="my-3 error" > {{ messageError }} </span> </div> 
+          </div>
+          <div class="modal-footer"> 
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> 
+            <button [hidden]="loading" class="btn btn-outline-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" 
+               role="status" aria-hidden="true">
+               </span> <span class="visually-hidden">Loading...</span> </button>
+            <button [hidden]="!loading" type="button" class="btn btn-danger" (click)="deleteCategory()"  > Delete  </button>
+          </div>
+       </div>
+    </div>
+ </div>

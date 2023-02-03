@@ -1,0 +1,173 @@
+<!--================ Start Banner Area =================-->
+<section class="banner_area" data-aos="fade-down">
+    <div class="banner_inner d-flex align-items-center">
+        <div class="container">
+            <div class="banner_content text-center">
+                <h2>Blog Details</h2>
+                <div class="page_link">
+                    <a href="javascript:void(0)" [routerLink]="'/visitor/home'">Home</a>
+                    <a href="javascript:void(0)" [routerLink]="'/visitor/blog'">Blog</a>
+                    <a href="javascript:void(0)">Blog Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--================ End Banner Area =================-->
+
+<!--================Blog Area =================-->
+<section class="blog_area single-post-area section_gap" data-aos="zoom-in" data-aos-duration="1000"  *ngIf="article as ArticleSelected">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 posts-list">
+                <div class="single-post row">
+                    <div class="col-lg-12">
+                        <div class="feature-img">
+                            <img class="img-fluid"
+                                style="width:750px ;height:350px;"
+                                [src]="getImage(ArticleSelected.idArticle , ArticleSelected.images[1].idImage)"
+                                alt="articleImage">
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3">
+                        <div class="blog_info text-right">
+                            <div class="post_tag">
+                                <a class="active" href="javascript:void(0)"> {{ ArticleSelected.category.categoryName }}
+                                </a>
+                            </div>
+                            <ul class="blog_meta list">
+                                <li><a href="javascript:void(0)">{{ ArticleSelected.writerName }}<i
+                                            class="lnr lnr-user"></i></a></li>
+                                <li><a href="javascript:void(0)">{{ ArticleSelected.dateCreation }}<i
+                                            class="lnr lnr-calendar-full"></i></a></li>
+                                <li><a href="javascript:void(0)">{{ ArticleSelected.comments.length }} Comments<i
+                                            class="lnr lnr-bubble"></i></a></li>
+                            </ul>
+                            <ul class="social-links">
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9 blog_details">
+                        <h2 class="mb-4"> {{ ArticleSelected.title }} </h2>
+                        <p class="excert" [innerHtml]="ArticleSelected.content"> </p>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="quotes">
+                            {{ ArticleSelected.description }}
+                        </div>
+                    </div>
+                </div>
+                <div class="navigation-area" [hidden]="true" >
+                    <div class="row"  >
+                        <div class="col-lg-6 col-md-6 col-12 nav-left flex-row d-flex justify-content-start align-items-center" >
+                            <div class="thumb">
+                                <a href="javascript:void(0)"><img class="img-fluid" src="assets/Visitor/img/blog/prev.jpg" alt=""></a>
+                            </div>
+                            <div class="arrow">
+                                <a href="javascript:void(0)"><span class="lnr text-white lnr-arrow-left"></span></a>
+                            </div>
+                            <div class="detials">
+                                <p>Prev Post</p>
+                                <a href="javascript:void(0)">
+                                    <h4> </h4>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-12 nav-right flex-row d-flex justify-content-end align-items-center">
+                            <div class="detials">
+                                <p>Next Post</p>
+                                <a href="javascript:void(0)">
+                                    <h4>  </h4>
+                                </a>
+                            </div>
+                            <div class="arrow">
+                                <a href="javascript:void(0)"><span class="lnr text-white lnr-arrow-right"></span></a>
+                            </div>
+                            <div class="thumb">
+                                <a href="javascript:void(0)"><img class="img-fluid"  src="assets/Visitor/img/blog/next.jpg" alt=""></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="comments-area">
+                    <h4> {{ ArticleSelected.comments.length }} Comments</h4>
+                    <div *ngFor="let comment of ArticleSelected.comments" class="pb-5">
+                        <div class="comment-list">
+                            <div class="single-comment justify-content-between d-flex">
+                                <div class="user justify-content-between d-flex">
+                                    <div class="thumb">
+                                        <img src="assets/Visitor/img/blog/c2.jpg" alt="">
+                                    </div>
+                                    <div class="desc">
+                                        <h5><a href="javascript:void(0)">{{ comment.name }}</a></h5>
+                                        <p class="date">{{ comment.dateCreation }} </p>
+                                        <p class="comment">
+                                            {{ comment.message }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="reply-btn">
+                                    <a href="javascript:void(0)" (click)="reply(comment.idComment , comment.name )"
+                                        class="btn-reply text-uppercase">reply</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="comment-list left-padding" *ngFor="let reply of comment.replies">
+                            <div class="single-comment justify-content-between d-flex">
+                                <div class="user justify-content-between d-flex">
+                                    <div class="thumb">
+                                        <img src="assets/Visitor/img/blog/c3.jpg" alt="">
+                                    </div>
+                                    <div class="desc">
+                                        <h5><a href="javascript:void(0)">{{ reply.replyName }}</a></h5>
+                                        <p class="date"> {{ reply.dateCreation }} </p>
+                                        <p class="comment">
+                                            {{ reply.message }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="comment-form">
+                    <h4> Leave a Comment </h4>
+                    <form [formGroup]="commentForm" (ngSubmit)=" onSubmit(ArticleSelected.idArticle) ">
+                        <div class="form-group form-inline">
+                            <div class="form-group col-lg-6 col-md-6 name">
+                                <div class="error" *ngIf=" !name.value && name?.touched"> Required name </div>
+                                <input type="text" class="form-control" id="name" formControlName="name"
+                                    placeholder="Enter name">
+                            </div>
+                            <div class="form-group col-lg-6 col-md-6 email">
+                                <div class="error" *ngIf=" !email.value && email.touched "> Required email </div>
+                                <input type="email" class="form-control" id="email" formControlName="email"
+                                    placeholder="Enter email">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="error" *ngIf=" !message.value && message.touched "> Required message </div>
+                            <textarea class="form-control mb-10" rows="5" id="message" formControlName="message"
+                                placeholder="Enter message"></textarea>
+                        </div>
+                        <button type="submit" class="primary-btn primary_btn" [hidden]="!hide"
+                            [disabled]="!commentForm.valid"><span>Post Comment</span></button>
+                        <button type="submit" class="primary-btn primary_btn mr-2" [hidden]="hide"
+                            [disabled]="!commentForm.valid"><span>Post Reply</span></button>
+                        <button type="button" class="primary-btn primary_btn" [hidden]="hide"
+                            (click)="cancelReply()"><span>Cancel Reply</span></button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+
+                <app-side-blog></app-side-blog>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+<!--================Blog Area =================-->

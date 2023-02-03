@@ -1,0 +1,115 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+     <h1> Project Page</h1>
+     <nav>
+        <ol class="breadcrumb">
+           <li class="breadcrumb-item"><a routerLink="/admin/dashboard"> admin </a></li>
+           <li class="breadcrumb-item"> Update Project </li>
+        </ol>
+     </nav>
+  </div>
+  <section class="section">
+     <div class="row">
+        <div class="col-lg-12">
+          
+          <div class="card pt-4 pb-3">
+
+              <div class="card-body">
+
+                <div class="col-12">
+                  <div class="card">
+                    <div class="p-3">
+                      <h4 class="card-title mb-0 cursor" (click)="back()"> <i class="bi bi-arrow-left"> </i> Back </h4>
+                    </div>
+                    <div class="card-body border-top" *ngIf="updatedProject | async as updatedProject">
+                      <h4 class="card-title mb-0"> Update project </h4>
+                      <form class="pt-4" #projectForm="ngForm" (ngSubmit)="updateProject(projectForm.value)" >
+                
+                        <input type="text" hidden class="form-control mb-4" name="idProject" [(ngModel)]="updatedProject.idProject" >
+                
+                        <div *ngIf=" !projectForm.controls['projectName']?.value && projectForm.controls['projectName']?.touched"  class="txt-error error mb-2"> Required title </div>
+                        <input type="text" maxlength="30" placeholder="Project Name" class="form-control mb-4" name="projectName" [(ngModel)]="updatedProject.projectName" >
+                
+                        <div *ngIf=" !projectForm.controls['description']?.value && projectForm.controls['description']?.touched"  class="txt-error error mb-2"> Required description </div>
+                        <input type="text" placeholder="Description" class="form-control mb-4" name="description" [(ngModel)]="updatedProject.description">
+                        
+                
+                        <div class="mb-3">
+                          <div *ngIf=" !projectForm.controls['content']?.value && projectForm.controls['content']?.touched"  class="txt-error error mb-2"> Required content </div>
+                          <textarea placeholder="Content" class="form-control  mb-4" name="content" rows="10" [(ngModel)]="updatedProject.content"></textarea>
+                        </div>
+                        
+                        <div *ngIf=" !projectForm.controls['clientName']?.value && projectForm.controls['clientName']?.touched"  class="txt-error error mb-2"> Required clientName </div>
+                        <input type="text" placeholder="Client Name" class="form-control  mb-4" name="clientName" [(ngModel)]="updatedProject.clientName">
+                        
+                        <div *ngIf=" !projectForm.controls['rating']?.value && projectForm.controls['rating']?.touched"  class="txt-error error mb-2"> Required rating </div>
+                        <input type="number" placeholder="Rating" class="form-control  mb-4" name="rating" [(ngModel)]="updatedProject.rating">
+                        
+                
+                        <label class="form-label my-2"> Completed :</label>
+                          <select class="form-select mb-4" aria-label="Default select example" name="completed" [(ngModel)]="updatedProject.completed" >
+                             <option [ngValue]="true"> Yes </option>
+                             <option [ngValue]="false" > No </option>
+                          </select>
+
+                          <div class="my-5" *ngIf="updatedProject.completed" > 
+                            <label for="completedDate" class="form-label"> Completed Date : </label>
+                            <div> <input type="date" class="form-control" id="completedDate" [(ngModel)]="updatedProject.completedDate" name="completedDate"></div>
+                         </div>  
+                        
+                        <div *ngIf=" !projectForm.controls['webSiteUrl']?.value && projectForm.controls['webSiteUrl']?.touched"  class="txt-error error mb-2"> Required webSiteUrl </div>
+                        <input type="text" placeholder="Web Site Url" class="form-control mb-4" name="webSiteUrl" [(ngModel)]="updatedProject.webSiteUrl">
+
+                        <div class="my-3" *ngIf="messageError" > <span class="error"> {{ messageError }} </span> </div>
+                        
+
+                        <button [hidden]="loading" class="btn btn-outline-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" 
+                          role="status" aria-hidden="true">
+                          </span> <span class="visually-hidden">Loading...</span> </button>
+                        <button type="submit" class="btn btn-outline-success mb-4" [disabled]="projectForm.invalid" > Update Project </button>
+                      
+                      </form>
+                
+                      <div class="mb-3">
+                        <label for="formFile" class="form-label my-2 mr-4"> Second Image preview : </label>
+                        <img class="img-fluid" 
+                          [src]="(imageUrl1 == null) ? getImage( updatedProject.idProject , updatedProject.images[0].idImage) : imageUrl1"
+                          height="200px" />
+                        <div>
+                          <input type="file" class="form-control my-4" accept="image/*" type="file" id="formFile2"
+                            (change)="onSelectFile($event, 1)">
+                          <button [disabled]="!imageUrl1" class="btn btn-outline-info mx-4" type="button"
+                            (click)="updateImage( updatedProject.idProject , updatedProject.images[0].idImage, 1)">Update Image</button>
+                        </div>
+                      </div>
+                
+                      <div class="mb-3">
+                        <label for="formFile" class="form-label my-2 mr-4"> Second Image preview : </label>
+                        <img class=" img-fluid" 
+                          [src]="(imageUrl2 == null) ? getImage(updatedProject.idProject , updatedProject.images[1].idImage) : imageUrl2"
+                          height="200px" />
+                        <div>
+                          <input type="file" class="form-control my-4" accept="image/*" type="file" id="formFile2"
+                            (change)="onSelectFile($event, 2)">
+                          <button [disabled]="!imageUrl2" class="btn btn-outline-info mx-4" type="button"
+                            (click)="updateImage( updatedProject.idProject , updatedProject.images[1].idImage, 2)">Update Image</button>
+                        </div>
+                      </div>
+                
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
+          </div>
+        </div>
+     </div>
+  </section>
+</main>           
+
+
+
+
+
+

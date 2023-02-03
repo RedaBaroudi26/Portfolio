@@ -1,0 +1,102 @@
+<main id="main" class="main">
+    <div class="pagetitle">
+       <h1> Project Page</h1>
+       <nav>
+          <ol class="breadcrumb">
+             <li class="breadcrumb-item"><a routerLink="/admin/dashboard">admin</a></li>
+             <li class="breadcrumb-item">Projects</li>
+          </ol>
+       </nav>
+    </div>
+    <section class="section">
+       <div class="row">
+          <div class="col-lg-12">
+            
+            <div class="card pt-4 pb-3">
+                <div class="card-body">
+
+                  <h5 class="card-title"> Projects  </h5>
+
+                  <div [hidden]="loading">
+                     <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-info" role="status"></div>
+                     </div>
+                  </div>
+
+                      <div *ngIf="projects | async as projects" > 
+
+                        <table *ngIf="projects.totalElements > 0 " >
+                            <thead>
+                               <tr>
+                                  <th scope="col"> # </th>
+                                  <th scope="col"> project Name </th>
+                                  <th scope="col"> rating </th>
+                                  <th scope="col"> clientName </th>
+                                  <th scope="col"> webSiteUrl </th>
+                                  <th scope="col"> Status </th>   
+                                  <th scope="col"> Option </th>
+                               </tr>
+                            </thead>
+                            <tbody>
+                               <tr *ngFor="let project of projects.content" >
+                                  <td data-label="idProject"> {{ project.idProject }} </td>
+                                  <td data-label="projectName"> {{ project.projectName }} </td>
+                                  <td data-label="rating"> {{ project.rating  }} </td>
+                                  <td data-label="clientName"> {{ project.clientName  }} </td>
+                                  <td data-label="webSiteUrl"> {{ project.webSiteUrl }} </td>
+                                  <td data-label="status" > <div class="badge " [ngClass]=" !project.completed ? 'bg-warning' :'bg-success'" > {{ project.completed ? 'Completed' : 'Pending' }} </div> </td>
+                                  <td data-label="Option"> 
+                                    <button class="btn btn-primary btn-sm mx-2" (click)="navigate(project.idProject)" > Edit </button> 
+                                    <button class="btn btn-danger  btn-sm " data-bs-toggle="modal" data-bs-target="#deleteProject"  (click)="selectedProject = project" > Delete </button> 
+                                  </td>
+                               </tr>
+                            </tbody>
+                         </table>
+
+                         <nav *ngIf="projects.totalPages > 1" class="mt-4" aria-label="Page navigation example">
+                           <ul class="pagination justify-content-center">
+                             
+                              <li class="page-item" [ngClass]="projects.number == 0 ? 'disabled' : '' " >
+                               <a class="page-link" href="javascript:void(0)" (click)="getProjects(projects.number - 1)" >Previous</a>
+                             </li>
+                            
+                             <li class="page-item" *ngFor="let number of counterNumber(projects.totalPages) ; let i = index " [ngClass]="projects.number == i ? 'active' : '' " ><a class="page-link" href="javascript:void(0)" (click)="getProjects( i )" > {{ i + 1 }} </a></li>
+                            
+                             <li class="page-item" [ngClass]="projects.number == ( projects.totalPages - 1 ) ? 'disabled' : '' " >
+                               <a class="page-link" href="javascript:void(0)" (click)="getProjects(projects.number + 1)" >Next</a>
+                             </li>
+                           </ul>
+                         </nav>
+
+                         <div class="d-flex justify-content-center mt-5 mb-3" *ngIf="projects.totalElements == 0" > <h1> No Projects Found </h1> </div>
+
+                      </div>
+
+                </div>
+                
+            </div>
+
+          </div>
+       </div>
+    </section>
+ </main>
+
+
+ <div class="modal fade" id="deleteProject" tabindex="-1">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h5 class="modal-title"> Delete Project </h5>
+             <button type="button" id="CloseModalDelete" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body"> 
+            <div> are you sure you want delete this project : {{ selectedProject.projectName }}  </div>
+            <div> <span> {{ messageError }} </span> </div> 
+          </div>
+          <div class="modal-footer"> 
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> 
+            <button type="button" class="btn btn-danger" (click)="deleteProject()"  > Delete  </button>
+          </div>
+       </div>
+    </div>
+ </div>

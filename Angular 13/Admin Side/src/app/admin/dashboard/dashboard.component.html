@@ -1,0 +1,178 @@
+<main id="main" class="main">
+
+   <div class="pagetitle">
+      <h1>Dashboard</h1>
+      <nav>
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+         </ol>
+      </nav>
+   </div>
+
+   <section class="section dashboard">
+      <div class="row">
+
+         <div class="col-lg-12">
+            <div class="row">
+
+               <div class="col-xxl-3 col-md-6" *ngIf="articles$ | async as articles">
+                  <div class="card info-card sales-card">
+                     <div class="card-body">
+                        <h5 class="card-title"> Articles </h5>
+                        <div class="d-flex align-items-center">
+                           <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i
+                                 _ngcontent-ymy-c32="" class="ri-article-fill"></i> </div>
+                           <div class="ps-3">
+                              <h6> {{ articles.totalElements }} </h6>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="col-xxl-3 col-md-6" *ngIf="projects$ | async as projects">
+                  <div class="card info-card revenue-card">
+                     <div class="card-body">
+                        <h5 class="card-title"> Projects </h5>
+                        <div class="d-flex align-items-center">
+                           <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i
+                                 _ngcontent-ymy-c32="" class="ri-folder-4-fill"></i></div>
+                           <div class="ps-3">
+                              <h6> {{ projects.totalElements }} </h6>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="col-xxl-3 col-xl-6" *ngIf=" ( numberOfCategories$ | async ) != -1 ">
+                  <div class="card info-card customers-card">
+                     <div class="card-body">
+                        <h5 class="card-title"> Categories </h5>
+                        <div class="d-flex align-items-center">
+                           <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i
+                                 _ngcontent-ymy-c31="" class="bx bxs-bookmark"></i></div>
+                           <div class="ps-3">
+                              <h6> {{ numberOfCategories$ | async }} </h6>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="col-xxl-3 col-xl-6" *ngIf=" ( numberOfComment$ | async ) != -1 " >
+                  <div class="card info-card customers-card">
+                     <div class="card-body">
+                        <h5 class="card-title"> Comments </h5>
+                        <div class="d-flex align-items-center">
+                           <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"><i
+                                 class="bi bi-chat"></i></div>
+                           <div class="ps-3">
+                              <h6> {{ numberOfComment$ | async }} </h6>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="col-12">
+
+
+
+                  <div class="card recent-sales overflow-auto">
+
+                     <div class="card-body">
+                        <h5 class="card-title"> Projects </h5>
+
+                        <div [hidden]="loading">
+                           <div class="d-flex justify-content-center">
+                              <div class="spinner-border text-info" role="status"></div>
+                           </div>
+                        </div>
+
+                        <div *ngIf="projects$ | async as projects">
+
+
+                           <table *ngIf="projects.totalElements > 0 ">
+                              <thead>
+                                 <tr>
+                                    <th scope="col"> # </th>
+                                    <th scope="col"> project Name </th>
+                                    <th scope="col"> rating </th>
+                                    <th scope="col"> clientName </th>
+                                    <th scope="col"> webSiteUrl </th>
+                                    <th scope="col"> Status </th>
+                                 </tr>
+                              </thead>
+                              <tbody>
+                                 <tr *ngFor="let project of projects.content.slice(0,5)">
+                                    <td data-label="idProject"> {{ project.idProject }} </td>
+                                    <td data-label="projectName"> {{ project.projectName }} </td>
+                                    <td data-label="rating"> {{ project.rating }} </td>
+                                    <td data-label="clientName"> {{ project.clientName }} </td>
+                                    <td data-label="webSiteUrl"> {{ project.webSiteUrl }} </td>
+                                    <td data-label="status">
+                                       <div class="badge " [ngClass]=" !project.completed ? 'bg-warning' :'bg-success'">
+                                          {{ project.completed ? 'Completed' : 'Pending' }} </div>
+                                    </td>
+                                 </tr>
+                              </tbody>
+                           </table>
+
+                           <div class="d-flex justify-content-center mt-5 mb-3" *ngIf="projects.totalElements == 0">
+                              <h1> No Projects Found </h1>
+                           </div>
+
+                        </div>
+                     </div>
+                  </div>
+
+
+
+               </div>
+
+               <div class="col-12">
+                  <div class="card overflow-auto">
+
+                     <div class="card-body pb-0">
+                        <h5 class="card-title"> Top Articles </h5>
+
+                        <div [hidden]="loading">
+                           <div class="d-flex justify-content-center">
+                              <div class="spinner-border text-info" role="status"></div>
+                           </div>
+                        </div>
+
+                        <div class="row" *ngIf="articles$ | async as articles ">
+
+                           <div class="col-lg-3" *ngFor="let article of articles.content.slice(0,4)">
+                              <div class="card">
+                                 <img [src]="getImage(article.idArticle , article.images[0].idImage)"
+                                    class="card-img-top" alt="...">
+                                 <div class="card-body">
+                                    <h5 class="card-title">{{ article.title }}</h5>
+                                    <p class="card-text">{{article.description }}</p>
+                                 </div>
+                                 <div class="card-footer">
+                                    <button type="button" class="btn btn-outline-info"> View More </button>
+                                 </div>
+                              </div>
+                           </div>
+
+                           <div class="d-flex justify-content-center mt-5 mb-5" *ngIf="articles.totalElements == 0">
+                              <h1> No Articles Found </h1>
+                           </div>
+
+                        </div>
+                     </div>
+
+                  </div>
+               </div>
+
+            </div>
+         </div>
+
+      </div>
+   </section>
+</main>

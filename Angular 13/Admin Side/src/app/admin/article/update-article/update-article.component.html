@@ -1,0 +1,157 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+     <h1> Tag Page</h1>
+     <nav>
+        <ol class="breadcrumb">
+           <li class="breadcrumb-item"><a routerLink="/admin/dashboard"> admin </a></li>
+           <li class="breadcrumb-item"> Article </li>
+        </ol>
+     </nav>
+  </div>
+  <section class="section">
+
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card pt-4 pb-3">
+
+          <div class="card-header">
+            <div class="mb-4 cursor" (click)="back()" > <i class="bi bi-arrow-left"></i> Back </div>
+            <h4 > Update Article </h4>
+          </div>
+         
+          
+          <div class="card-body">
+
+              <div class="card-body border-top" *ngIf="articleUpdated | async as articleUpdated">
+               
+          
+                <form class="mt-4" #articleForm="ngForm" (ngSubmit)="updateArticle(articleForm.value)">
+          
+                  <input type="text" class="form-control mt-5 mb-4" name="idArticle" hidden [(ngModel)]="articleUpdated.idArticle"  required>
+          
+                  <div class="mb-3">
+                    <div *ngIf=" !articleForm.controls['title']?.value && articleForm.controls['title']?.touched"  class="txt-error error mb-2"> Required title </div>
+                    <input type="text" placeholder="Title" class="form-control mb-4" name="title"  [(ngModel)]="articleUpdated.title" maxlength="30" required >
+                  </div>
+          
+                  <div class="mb-3">
+                    <div *ngIf=" !articleForm.controls['description']?.value && articleForm.controls['description']?.touched"  class="txt-error error mb-2"> Required description </div>
+                    <input type="text" placeholder="Description" class="form-control  mb-4" name="description"  [(ngModel)]="articleUpdated.description" required>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <div *ngIf=" !articleForm.controls['dateCreation']?.value && articleForm.controls['dateCreation']?.touched"  class="txt-error error mb-2"> Required dateCreation </div>
+                    <input type="datetime-local" placeholder="dateCreation" class="form-control  mb-4" name="dateCreation"  [(ngModel)]="articleUpdated.dateCreation" required>
+                  </div>  
+                  
+                  <div class="mb-3">
+                    <div *ngIf=" !articleForm.controls['content']?.value && articleForm.controls['content']?.touched"  class="txt-error error mb-2"> Required content </div>
+                    <textarea placeholder="Content" class="form-control mb-4" name="content" rows="10"  [(ngModel)]="articleUpdated.content" required></textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <div *ngIf=" !articleForm.controls['writerName']?.value && articleForm.controls['writerName']?.touched"  class="txt-error error mb-2"> Required writer Name </div>
+                    <input type="text" placeholder="Writer Name" class="form-control  mb-4" name="writerName"  [(ngModel)]="articleUpdated.writerName" required>
+                  </div>
+          
+                  <div class="mb-3">
+                    <div *ngIf=" !articleForm.controls['categoryName']?.value && articleForm.controls['categoryName']?.touched"  class="txt-error error mb-2"> Required category Name </div>
+                    <select class="form-select mb-4" name="categoryName" [ngModel]="articleUpdated.category.categoryName" required>
+                      <option *ngFor="let category of categories" [ngValue]="category.categoryName" > {{ category.categoryName }} </option>
+                    </select>
+                  </div>
+          
+                  <button [hidden]="loading" class="btn btn-outline-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" 
+                    role="status" aria-hidden="true">
+                    </span> <span class="visually-hidden">Loading...</span> </button>
+                  <button [hidden]="!loading" type="submit" class="btn btn-outline-success mb-4"> Update Article </button>
+          
+                </form>
+          
+                <div class="mb-3">
+                  <label for="formFile" class="form-label my-2 mr-4"> First Image preview : </label>
+                  <img class=" img-fluid"
+                    [src]="(imageUrl1 == null) ? getImage(articleUpdated.idArticle , articleUpdated.images[0].idImage) : imageUrl1 "
+                    height="200px" />
+                  <div>
+                    <input type="file" class="form-control my-4" accept="image/*" type="file" id="formFile"
+                      (change)="onSelectFile($event , 1)">
+                    <button [disabled]="!imageUrl1" class="btn btn-outline-info mx-4" type="button"
+                      (click)="updateImage(articleUpdated.idArticle , articleUpdated.images[0].idImage, 1)">Update Image</button>
+                  </div>
+                </div>
+          
+                <div class="mb-3">
+                  <label for="formFile" class="form-label my-2 mr-4"> Second Image preview : </label>
+                  <img class=" img-fluid" 
+                    [src]="(imageUrl2 == null) ? getImage(articleUpdated.idArticle , articleUpdated.images[1].idImage) : imageUrl2"
+                    height="200px" />
+                  <div>
+                    <input type="file" class="form-control my-4" accept="image/*" type="file" id="formFile2"
+                      (change)="onSelectFile($event, 2)">
+                    <button [disabled]="!imageUrl2" class="btn btn-outline-info mx-4" type="button"
+                      (click)="updateImage(articleUpdated.idArticle , articleUpdated.images[1].idImage, 2)">Update Image</button>
+                  </div>
+                </div>
+          
+                <div *ngIf="articleUpdated.comments" class="row d-flex justify-content-center mt-5">
+                  <div class="col-md-12 col-lg-12" *ngFor="let comment of articleUpdated.comments " >
+                    <div class="card shadow-0 border" style="background-color: #f0f2f5;" >
+                      <div class="card-body p-2">
+                        <div class="card mb-2">
+                          <div class="mx-4 mt-2" style="color: black;">Comment</div>
+                          <div class="card-body">
+                            <p> {{ comment.message }} </p>
+          
+                            <div class="d-flex justify-content-between">
+                              <div class="d-flex flex-row align-items-center">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(4).webp" alt="avatar" width="25"
+                                  height="25" />
+                                <p class="small mb-0 ms-2"> {{ comment.email }} , Date : {{ comment.dateCreation  | date : 'MMM dd y' }} </p>
+                              </div>
+                              <div class="d-flex flex-row align-items-center">
+                                <button class="btn btn-outline-danger btn-sm" type="button" (click)="deleteComment(comment.idComment)"> Delete </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+          
+                      <div class="card-body p-2 ml-5" *ngFor="let reply of comment.replies">
+                        <div class="card mb-2">
+                          <div class="mx-4 mt-2" style="color: black;">Reply</div>
+                          <div class="card-body">
+                            <p> {{ reply.message }} </p>
+                            <div class="d-flex justify-content-between">
+                              <div class="d-flex flex-row align-items-center">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(4).webp" alt="avatar" width="25"
+                                  height="25" />
+                                <p class="small mb-0 ms-2"> {{ reply.email }} , Date : {{ reply.dateCreation | date : 'MMM dd y' }} </p>
+                              </div>
+                              <div class="d-flex flex-row align-items-center">
+                                <button class="btn btn-outline-danger btn-sm" type="button" (click)="deleteReply(reply.idReply)"> Delete </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+          
+          
+              </div>
+
+
+            </div>
+        </div>
+      </div>
+    </div>       
+  
+  </section>
+
+
+
+
+

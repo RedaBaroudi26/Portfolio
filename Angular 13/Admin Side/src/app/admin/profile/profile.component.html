@@ -1,0 +1,154 @@
+<main id="main" class="main">
+    <div class="pagetitle">
+       <h1>Profile</h1>
+       <nav>
+          <ol class="breadcrumb">
+             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+             <li class="breadcrumb-item">Users</li>
+             <li class="breadcrumb-item active">Profile</li>
+          </ol>
+       </nav>
+    </div>
+    <section class="section profile" *ngIf="user$ | async as user ">
+       <div class="row">
+          <div class="col-xl-4">
+             <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                   <img src="assets/Admin/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                   <h2> {{ user.fullName }} </h2>
+                   <h3> {{ user.job }} </h3>
+                   <div class="social-links mt-2"> 
+                    <a [href]="user.socialMedia!.twitterProfile" class="twitter"><i class="bi bi-twitter"></i></a> 
+                    <a [href]="user.socialMedia!.facebookProfile" class="facebook"><i class="bi bi-facebook"></i></a> 
+                    <a [href]="user.socialMedia!.instagramProfile" class="instagram"><i class="bi bi-instagram"></i></a> 
+                    <a [href]="user.socialMedia!.linkedinProfile" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div class="col-xl-8"  >
+             <div class="card">
+                <div class="card-body pt-3">
+                   <ul class="nav nav-tabs d-flex">
+
+                      <li class="nav-item flex-fill"> <button class="nav-link w-100 active" id="overview" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button></li>
+                      <li class="nav-item flex-fill"> <button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button></li>
+
+                   </ul>
+
+                   <div class="tab-content pt-2">
+                      <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                         <h5 class="card-title">About</h5>
+                         <p class="small fst-italic" [innerHTML]="user.about" ></p>
+                         <h5 class="card-title">Profile Details</h5>
+                         <div class="row">
+                            <div class="col-lg-3 col-md-4 label ">Full Name</div>
+                            <div class="col-lg-9 col-md-8">{{ user.fullName }}</div>
+                         </div>
+                         <div class="row">
+                            <div class="col-lg-3 col-md-4 label">Company</div>
+                            <div class="col-lg-9 col-md-8">{{ user.company }}</div>
+                         </div>
+                         <div class="row">
+                            <div class="col-lg-3 col-md-4 label">Job</div>
+                            <div class="col-lg-9 col-md-8"> {{ user.job }}  </div>
+                         </div>
+                         <div class="row">
+                            <div class="col-lg-3 col-md-4 label">Country</div>
+                            <div class="col-lg-9 col-md-8"> {{ user.country }} </div>
+                         </div>
+                         <div class="row">
+                            <div class="col-lg-3 col-md-4 label">Address</div>
+                            <div class="col-lg-9 col-md-8"> {{ user.address }} </div>
+                         </div>
+                         <div class="row">
+                            <div class="col-lg-3 col-md-4 label">Phone</div>
+                            <div class="col-lg-9 col-md-8"> {{ user.phone }} </div>
+                         </div>
+                      </div>
+
+                      <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                         <form #userEdited="ngForm" (ngSubmit)="editProfile(userEdited.value)" >
+
+                           <input name="idUser" [(ngModel)]="user.idUser" type="text" [hidden]="true" required>
+
+                            <div class="row mb-3">
+                               <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
+                               <div class="col-md-8 col-lg-9"> <input name="fullName" [(ngModel)]="user.fullName" type="text" class="form-control" id="fullName" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
+                               <div class="col-md-8 col-lg-9"><textarea name="about" [(ngModel)]="user.about" class="form-control" id="about" style="height: 100px" required></textarea></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="company" class="col-md-4 col-lg-3 col-form-label">Company</label>
+                               <div class="col-md-8 col-lg-9"> <input name="company" [(ngModel)]="user.company" type="text" class="form-control" id="company" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="Job" class="col-md-4 col-lg-3 col-form-label">Job</label>
+                               <div class="col-md-8 col-lg-9"> <input name="job" [(ngModel)]="user.job" type="text" class="form-control" id="Job" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="Country" class="col-md-4 col-lg-3 col-form-label">Country</label>
+                               <div class="col-md-8 col-lg-9"> <input name="country" [(ngModel)]="user.country" type="text" class="form-control" id="Country" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="Address" class="col-md-4 col-lg-3 col-form-label">Address</label>
+                               <div class="col-md-8 col-lg-9"> <input name="address" [(ngModel)]="user.address" type="text" class="form-control" id="Address" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
+                               <div class="col-md-8 col-lg-9"> <input name="phone" [(ngModel)]="user.phone" type="text" class="form-control" id="Phone" required></div>
+                            </div>
+
+                            <input name="idSocialMedia" [hidden]="true"  [(ngModel)]="user.socialMedia!.idSocialMedia" type="text" required>
+
+                            <div class="row mb-3">
+                               <label for="Twitter" class="col-md-4 col-lg-3 col-form-label">Twitter Profile</label>
+                               <div class="col-md-8 col-lg-9"> <input name="twitterProfile" [(ngModel)]="user.socialMedia!.twitterProfile" type="text" class="form-control" id="Twitter" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="Facebook" class="col-md-4 col-lg-3 col-form-label">Facebook Profile</label>
+                               <div class="col-md-8 col-lg-9"> <input name="facebookProfile" [(ngModel)]="user.socialMedia!.facebookProfile" type="text" class="form-control" id="Facebook" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="Instagram" class="col-md-4 col-lg-3 col-form-label">Instagram Profile</label>
+                               <div class="col-md-8 col-lg-9"> <input name="instagramProfile" [(ngModel)]="user.socialMedia!.instagramProfile" type="text" class="form-control" id="Instagram" required></div>
+                            </div>
+
+                            <div class="row mb-3">
+                               <label for="Linkedin" class="col-md-4 col-lg-3 col-form-label">Linkedin Profile</label>
+                               <div class="col-md-8 col-lg-9"> <input name="linkedinProfile" [(ngModel)]="user.socialMedia!.linkedinProfile" type="text" class="form-control" id="Linkedin" required></div>
+                            </div>
+
+                            <input name="idAccount" [(ngModel)]="user.account!.idAccount" type="text" [hidden]="true" required>
+
+                            <div class="row mb-3">
+                              <div class="col-md-8 col-lg-9" *ngIf="messageError"> {{ messageError }}</div>
+                           </div>
+
+                            <div class="text-center">
+                              <button [hidden]="loading" class="btn btn-outline-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" 
+                                 role="status" aria-hidden="true">
+                                 </span> <span class="visually-hidden">Loading...</span> </button>
+                              <button [hidden]="!loading" type="submit" class="btn btn-primary" [disabled]="userEdited.invalid">Save Changes</button>
+                            </div>
+                         </form>
+                      </div>
+
+
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </section>
+ </main>

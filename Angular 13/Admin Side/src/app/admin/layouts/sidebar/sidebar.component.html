@@ -1,0 +1,35 @@
+<aside id="sidebar" class="sidebar">
+    <ul class="sidebar-nav mt-5" id="sidebar-nav">
+       
+      <li class="nav-item mb-3"> <a class="nav-link collapsed" routerLink="/admin/dashboard" > <i class="bi bi-grid"></i> <span> Dashboard </span> </a></li>
+
+      <li class="nav-item mb-3"> <a class="nav-link collapsed" routerLink="/admin/category" > <i class="bx bxs-bookmark"></i> <span> Categories </span> </a></li>
+
+       <li class="nav-item mb-3 " >
+          <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#"> <i class="ri-article-fill"></i><span> Aricles </span><i class="bi bi-chevron-down ms-auto"></i> </a>
+          <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+             <li> <a  routerLink="/admin/article" > <i class="bi bi-circle"></i><span>All Articles</span> </a></li>
+             <li> <a  routerLink="/admin/addArticle"  > <i class="bi bi-circle"></i><span>add Article</span> </a></li>
+          </ul>
+       </li>
+
+       <li class="nav-item mb-3" >
+          <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#"> <i class="ri-folder-4-fill"></i><span> Projects </span><i class="bi bi-chevron-down ms-auto"></i> </a>
+          <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+             <li> <a routerLink="/admin/project"> <i class="bi bi-circle"></i><span> all Projects</span> </a></li>
+             <li> <a routerLink="/admin/addProject"> <i class="bi bi-circle"></i><span> Add Project</span> </a></li>
+          </ul>
+       </li>
+
+       <li class="nav-item mb-3"   >
+         <a class="nav-link collapsed" data-bs-target="#skills-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-journal-text"></i><span> Skills </span><i class="bi bi-chevron-down ms-auto"></i> </a>
+         <ul id="skills-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+            <li> <a routerLink="/admin/skill"> <i class="bi bi-circle"></i><span> all Skills </span> </a></li>
+            <li> <a routerLink="/admin/addSkill"> <i class="bi bi-circle"></i><span> Add Skill </span> </a></li>
+         </ul>
+      </li>
+
+       <li class="nav-item mb-3 collapsed" > <a class="nav-link collapsed" routerLink="/admin/tag"> <i class="bi bi-person"></i> <span> Tags </span> </a></li>
+       
+    </ul>
+ </aside>

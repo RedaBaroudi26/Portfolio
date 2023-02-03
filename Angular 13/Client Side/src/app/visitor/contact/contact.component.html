@@ -1,0 +1,80 @@
+
+<!--================ Start Banner Area =================-->
+<section class="banner_area" data-aos="fade-down">
+    <div class="banner_inner d-flex align-items-center">
+        <div class="container">
+            <div class="banner_content text-center">
+                <h2>Contact Me</h2>
+                <div class="page_link">
+                    <a href="javascript:void(0)" [routerLink]="['/visitor/home']">Home</a>
+                    <a href="javascript:void(0)" >Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--================ End Banner Area =================-->
+
+<!--================Contact Area =================-->
+<section class="contact_area section_gap" data-aos="zoom-in" data-aos-duration="1000">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3"  >
+                <div [hidden]="loading" style=" text-align:center;"  class="mt-5"  > <div class="lds-dual-ring"> </div> </div>        
+                <div class="contact_info" *ngIf="user$ | async as user" >
+                    <div class="info_item mb-4">
+                        <i class="lnr lnr-home"></i>
+                        <div> <h6>{{ user.country +"  "+ user.address }}</h6>  </div>
+                    </div>
+                    <div class="info_item">
+                        <i class="lnr lnr-phone-handset"></i>
+                        <h6><a href="javascript:void(0)"> {{ user.phone }} </a></h6>
+                        <p>Mon to Fri 9 am to 6 pm</p>
+                    </div>
+                    <div class="info_item">
+                        <i class="lnr lnr-envelope"></i>
+                        <h6><a href="#"> rida04baroudi35@gmail.com </a></h6>
+                        <p>Send us your query anytime!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <form class="row contact_form" id="contactForm" novalidate="novalidate" [formGroup]="contactForm"
+                    (ngSubmit)="onSubmit(contactForm)">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="name" formControlName="name"
+                                placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="email" formControlName="email"
+                                placeholder="Enter email address">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="subject" formControlName="subject"
+                                placeholder="Enter Subject">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <textarea class="form-control" formControlName="message" id="message" rows="1"
+                                placeholder="Enter Message"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-right">
+                        <button type="submit" value="submit" class="primary_btn">
+                            <span>Send Message</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="mapBox" class="mapBox">
+            <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1175.7456857553027!2d-7.600888433303629!3d33.540097578617804!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda632bc9e05e3cf%3A0xec5f7c1bf21da6db!2sAv.%202%20Mars%2C%20Casablanca!5e0!3m2!1sfr!2sma!4v1669584795867!5m2!1sfr!2sma"
+                width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+</section>
+<!--================Contact Area =================-->

@@ -1,0 +1,76 @@
+<main id="main" class="main">
+   <div class="pagetitle">
+      <h1> Skill Page</h1>
+      <nav>
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/admin/dashboard"> admin </a></li>
+            <li class="breadcrumb-item"> Update Skill </li>
+         </ol>
+      </nav>
+   </div>
+   <section class="section">
+      <div class="row">
+         <div class="col-lg-12">
+
+            <div class="card pt-4 pb-3">
+
+               <div class="card-header">
+                  <div class="mb-4 cursor" (click)="back()" > <i class="bi bi-arrow-left"></i> Back </div>
+                  <h4 > Update Article </h4>
+                </div>
+
+               <div class="card-body">
+
+                  <div class="card-body border-top" *ngIf="skill$ | async as skill">
+
+
+                     <form class="mt-4" #skillUpdated="ngForm" (ngSubmit)="updateSkill(skillUpdated.value)">
+
+                        <input type="text" class="form-control mt-5 mb-4" name="idSkill" hidden  [(ngModel)]="skill.idSkill" required>
+
+                        <div class="mb-3">
+                           <div
+                              *ngIf=" !skillUpdated.controls['skillName']?.value && skillUpdated.controls['skillName']?.touched"
+                              class="txt-error error mb-2"> Required skill Name </div>
+                           <input type="text" placeholder="skillName" class="form-control mb-4" name="skillName"
+                              [(ngModel)]="skill.skillName" required>
+                        </div>
+
+                        <div class="mb-3">
+                           <div
+                              *ngIf=" !skillUpdated.controls['percentage']?.value && skillUpdated.controls['percentage']?.touched"
+                              class="txt-error error mb-2"> Required percentage </div>
+                           <input type="text" placeholder="percentage" class="form-control  mb-4" name="percentage"
+                              [(ngModel)]="skill.percentage" required>
+                        </div>
+
+                        <button [hidden]="loading" class="btn btn-outline-primary" type="button" disabled> <span class="spinner-border spinner-border-sm" 
+                           role="status" aria-hidden="true">
+                           </span> <span class="visually-hidden">Loading...</span> </button>
+                        <button type="submit" class="btn btn-outline-success mb-4"> Update Skill </button>
+
+                     </form>
+
+                     <div class="mb-3">
+                        <label for="formFile" class="form-label my-2 mr-4"> Image preview : </label>
+                        <img class=" img-fluid"
+                           [src]="(imageUrl == null) ? getImage(skill.idSkill , skill.image!.idImage) : imageUrl "
+                           height="200px" />
+                        <div>
+                           <input type="file" class="form-control my-4" accept="image/*" type="file" id="formFile"
+                              (change)="onSelectFile($event)">
+
+                           <button [disabled]="!imageUrl" class="btn btn-outline-info mx-4" type="button"
+                              (click)="updateImage(skill.idSkill , skill.image!.idImage )">Update Image</button>
+                        </div>
+                     </div>
+
+                     <div *ngIf="messageError" > {{ messageError }} </div>  
+
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+</main>

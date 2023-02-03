@@ -1,0 +1,72 @@
+
+    <div class="blog_right_sidebar">
+        
+        <aside class="single_sidebar_widget search_widget" [hidden]="hide">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search Posts" #word >
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" (click)="filterByWord(word.value)" ><i class="lnr lnr-magnifier"></i></button>
+                </span>
+            </div><!-- /input-group -->
+            <div style=" text-align: center; " ><button class="genric-btn danger-border small mt-4" [hidden]=" word.value == '' " (click)="filterByCategory('') ; word.value = '' " > Cancel Search </button></div>
+            <div class="br"></div>
+        </aside>
+
+
+        <aside class="single_sidebar_widget author_widget" *ngIf="user$ | async as user " >
+            <img class="author_img rounded-circle" src="assets/Visitor/img/blog/author.png" alt="">
+            <h4> {{ user.fullName }} </h4>
+            <p> {{ user.job }} </p>
+            <div class="br"></div>
+        </aside>
+        <aside class="single_sidebar_widget popular_post_widget" *ngIf="articlePage$ | async as articlePage">
+            <h3 class="widget_title">Popular Posts</h3>
+            
+            
+            <div class="media post_item" *ngFor="let article of articlePage.content.slice(0 , 3)">
+                <img class="img-fluid" [src]="getImage(article.idArticle , article.images[0].idImage)" style="height:60px ;width: 100px;" alt="post">
+                <div class="media-body">
+                    <a href="javascript:void(0)" [routerLink]="['/visitor/blogDetails/' , article.title]" ><h3>{{article.title }}</h3></a>
+                    <p>{{article.dateCreation | date : 'MMM dd y hh:mm' }}</p>
+                </div>
+            </div>
+
+            <div class="br"></div>
+        </aside>
+
+
+        <aside class="single_sidebar_widget ads_widget">
+            <a href="javascript:void(0)"><img class="img-fluid" src="assets/Visitor/img/blog/add.jpg" alt=""></a>
+            <div class="br"></div>
+        </aside>
+        <aside class="single_sidebar_widget post_category_widget" *ngIf="categories$ | async as categories"  > 
+            <h4 class="widget_title">Post Catgories</h4>
+            <ul class="list cat-list">
+
+                <li  *ngIf="articlePage$ | async as articlePage" >
+                    <a href="javascript:void(0)" class="d-flex justify-content-between" (click)="filterByCategory('') ; word.value = '' " >
+                        <p> All Articles </p>
+                        <p> {{ articlePage.totalElements }} </p>
+                    </a>
+                </li>
+
+                <li *ngFor="let category of categories" [hidden]="hide" >
+                    <a href="javascript:void(0)" class="d-flex justify-content-between" (click)="filterByCategory(category.categoryName) ; word.value = '' " >
+                        <p> {{ category.categoryName }} </p>
+                        <p> {{ category.numberOfArticles }} </p>
+                    </a>
+                </li>
+                                        
+            </ul>
+            <br/>
+        </aside>
+
+        <aside class="single-sidebar-widget tag_cloud_widget" *ngIf="tags$ | async as tags">
+            <h4 class="widget_title">Tag Clouds</h4>
+            <ul class="list">
+                <li *ngFor="let tag of tags"><a href="javascript:void(0)">{{ tag.tagName }}</a></li>
+            </ul>
+        </aside>
+
+    </div>
+

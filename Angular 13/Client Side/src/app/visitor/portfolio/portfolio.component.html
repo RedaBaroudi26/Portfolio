@@ -1,0 +1,73 @@
+<!--================ Start Banner Area =================-->
+<section class="banner_area" data-aos="fade-down">
+    <div class="banner_inner d-flex align-items-center">
+        <div class="container">
+            <div class="banner_content text-center">
+                <h2>Portfolio</h2>
+                <div class="page_link">
+                    <a href="javascript:void(0)" [routerLink]="['/visitor/home']">Home</a>
+                    <a href="javascript:void(0)">Portfolio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--================ End Banner Area =================-->
+
+<!--================Start Portfolio Area =================-->
+<section class="portfolio_area section_gap_top" id="portfolio" data-aos="zoom-in" data-aos-duration="1000">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="main_title text-left">
+                    <h2> quality work <br>
+                        Recently done project </h2>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="projects$ | async as projects" >
+            <div class="filters portfolio-filter" *ngIf="projects.length != 0 " >
+                <ul>
+                    <li class="active" data-filter="*"> all </li>
+                    <li data-filter=".completed"> completed </li>
+                    <li data-filter=".upcoming"> upcoming </li>
+                </ul>
+            </div>
+
+            <div class="filters-content mb-5 pb-5" *ngIf="projects.length != 0 ">
+                
+                <div class="row portfolio-grid justify-content-center">
+
+                    <div class="col-lg-4 col-md-6 all" *ngFor="let project of projects"
+                        [ngClass]="project.completed ? 'completed' : 'upcoming' ">
+                        <div class="portfolio_box">
+                            <div class="single_portfolio"
+                                [routerLink]="['/visitor/portfolioDetails' , project.projectName]">
+                                <img class="img-fluid w-100"
+                                    [src]="getImage(project.idProject , project.images[0].idImage)" alt="">
+                                <div class="overlay"></div>
+                            </div>
+                            <div class="short_info">
+                                <h4><a href="javascript:void(0)"
+                                        [routerLink]="['/visitor/portfolioDetails' , project.idProject]"> {{
+                                        project.projectName }} </a></h4>
+                                <p> {{ project.description }} </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+
+                </div>
+            </div>
+            <h1 style=" text-align:center;" class="mt-5" *ngIf="projects.length == 0 " > No Projects Found </h1>
+        </div>
+
+        <div [hidden]="loading" style=" text-align:center;" class="mt-5">
+            <div class="lds-dual-ring"> </div>
+        </div>
+
+    </div>
+</section>
+<!--================End Portfolio Area =================-->
