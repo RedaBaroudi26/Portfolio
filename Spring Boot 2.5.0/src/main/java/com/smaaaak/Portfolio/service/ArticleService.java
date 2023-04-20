@@ -1,5 +1,6 @@
 package com.smaaaak.Portfolio.service;
 
+import com.smaaaak.Portfolio.dto.ArticleDto;
 import com.smaaaak.Portfolio.model.Article;
 import com.smaaaak.Portfolio.model.projection.ArticleProjection;
 import org.springframework.data.domain.Page;
@@ -13,15 +14,15 @@ public interface ArticleService {
 
     Article getArticleByTitle(String title) ;
 
-    Page<ArticleProjection> getArticleByProjectionAndPagesAndByCategory(String categoryName ,int offset, int size) ;
+    Page<ArticleDto> getArticleByProjectionAndPagesAndByCategory(String categoryName , int offset, int size) ;
 
     Page<Article> getArticleByPage(int offset , int size) ;
 
-    Page<ArticleProjection> getArticleByProjectionAndPages(int offset , int size) ;
+    Page<ArticleDto> getArticleByProjectionAndPages(int offset , int size) ;
 
     Article getArticleByIdArticle(Long idaArticle) ;
 
-    Page<ArticleProjection> getArticlesByWordAndPageAndProjection(String word, int offset , int size) ;
+    Page<ArticleDto> getArticlesByWordAndPageAndProjection(String word, int offset , int size) ;
 
     Article addNewArticle(MultipartFile[] files, String article) ;
 

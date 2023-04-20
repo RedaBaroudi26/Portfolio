@@ -3,12 +3,14 @@ package com.smaaaak.Portfolio.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smaaaak.Portfolio.Exception.ApiRequestException;
+import com.smaaaak.Portfolio.dto.ArticleDto;
+import com.smaaaak.Portfolio.mapper.MapStructMapper;
 import com.smaaaak.Portfolio.model.Article;
 import com.smaaaak.Portfolio.model.Image;
-import com.smaaaak.Portfolio.model.projection.ArticleProjection;
 import com.smaaaak.Portfolio.repository.ArticleRepository;
 import com.smaaaak.Portfolio.repository.ImageRepository;
 import com.smaaaak.Portfolio.share.ImageUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
@@ -25,20 +27,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
-    private ArticleRepository articleRepository ;
-    private ImageRepository imageRepository ;
-    private ServletContext context ;
+    private final ArticleRepository articleRepository ;
+    private final ImageRepository imageRepository ;
+    private final ServletContext context ;
+    private final MapStructMapper mapper ;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, ImageRepository imageRepository, ServletContext context) {
-        this.articleRepository = articleRepository;
-        this.imageRepository = imageRepository;
-        this.context = context;
-    }
 
     @Override
     public List<Article> getAllArticles() {
@@ -47,10 +46,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Article getArticleByTitle(String title){
-        if( !this.articleRepository.findArticleByTitle(title).isPresent()){
-             throw new ApiRequestException(" article not found ") ;
-        }
-        return this.articleRepository.findArticleByTitle(title).get() ;
+        return this.articleRepository.findArticleByTitle(title).orElseThrow(
+                () -> new ApiRequestException(" article not found ")
+        );
     }
 
     @Override
@@ -60,31 +58,30 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<ArticleProjection> getArticleByProjectionAndPages(int offset, int size) {
+    public Page<ArticleDto> getArticleByProjectionAndPages(int offset, int size) {
         Pageable pageable = PageRequest.of(offset, size) ;
-        return this.articleRepository.getArticlesByPages(pageable);
+        return this.articleRepository.getArticlesByPages(pageable).map(mapper::articleToArticleDTO);
     }
 
     @Override
-    public Page<ArticleProjection> getArticleByProjectionAndPagesAndByCategory(String categoryName,int offset, int size) {
+    public Page<ArticleDto> getArticleByProjectionAndPagesAndByCategory(String categoryName, int offset, int size) {
         Pageable pageable = PageRequest.of(offset, size) ;
-        return this.articleRepository.findArticlesByCategory_CategoryName(categoryName , pageable);
+        return this.articleRepository.findArticlesByCategory_CategoryName(categoryName , pageable)
+                      .map( mapper::articleToArticleDTO )  ;
     }
 
 
     @Override
-    public Article getArticleByIdArticle(Long idaArticle) {
-        Article article = this.articleRepository.findById(idaArticle).get() ;
-        if(article == null ){
-            throw new ApiRequestException(" this article doesn't exists ");
-        }
-        return article ;
+    public Article getArticleByIdArticle(Long idArticle) {
+        return this.articleRepository.findById(idArticle).orElseThrow(
+                () -> new ApiRequestException(" this article doesn't exists ")
+        ) ;
     }
 
     @Override
-    public Page<ArticleProjection> getArticlesByWordAndPageAndProjection(String word, int offset, int size) {
+    public Page<ArticleDto> getArticlesByWordAndPageAndProjection(String word, int offset, int size) {
         Pageable pageable = PageRequest.of(offset , size) ;
-        return this.articleRepository.getArticlesByWord(word , pageable);
+        return this.articleRepository.getArticlesByWord(word , pageable).map(mapper::articleToArticleDTO) ;
     }
 
     @Override
@@ -101,9 +98,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void deleteArticle(Long idArticle) {
-        if(!this.articleRepository.findById(idArticle).isPresent()){
-            throw new ApiRequestException(" article doesn't exists ") ;
-        }
+        getArticleByIdArticle(idArticle) ;
         this.deleteDirectory(idArticle);
         this.articleRepository.deleteById(idArticle); ;
     }
@@ -120,9 +115,9 @@ public class ArticleServiceImpl implements ArticleService {
             throw new ApiRequestException(e.getMessage()) ;
         }
 
-        if(this.articleRepository.findArticleByTitle(_article.getTitle()).isPresent()){
-            throw new ApiRequestException(" this article title already exists ") ;
-        }
+        this.articleRepository.findArticleByTitle(_article.getTitle()).ifPresent(
+                arti -> {  throw new ApiRequestException(" this article title already exists ") ; }
+        );
 
 
         String url = ( ImageUtil.ARTICLES + _article.getCategory().getCategoryName() + "/" + _article.getTitle() + "/" ).replaceAll("\\s+" , "") ;
@@ -175,11 +170,9 @@ public class ArticleServiceImpl implements ArticleService {
             throw new ApiRequestException(e.getMessage()) ;
         }
 
-        if(!this.articleRepository.findById(_article.getIdArticle()).isPresent()){
-            throw new ApiRequestException(" article ot Found ") ;
-        }
 
-        oldestArticle = this.articleRepository.findById(_article.getIdArticle()).get() ;
+        oldestArticle = getArticleByIdArticle(_article.getIdArticle()) ;
+
 
         if(! ( oldestArticle.getTitle().equals(_article.getTitle()) && oldestArticle.getCategory().getCategoryName().equals(_article.getCategory().getCategoryName()) ) ){
 
@@ -208,7 +201,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private void deleteDirectory(Long idArticle){
-        Article article = this.articleRepository.findById(idArticle).get() ;
+        Article article = getArticleByIdArticle(idArticle) ;
         String url = ( ImageUtil.ARTICLES + article.getCategory().getCategoryName() + "/" + article.getTitle() ).replaceAll("\\s+" , "") ;
         boolean isExist = new File(context.getRealPath(url)).exists() ;
         if (isExist) {

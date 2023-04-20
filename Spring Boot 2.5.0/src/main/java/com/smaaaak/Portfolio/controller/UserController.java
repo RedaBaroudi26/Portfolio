@@ -6,10 +6,11 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smaaaak.Portfolio.dto.ProfileDto;
 import com.smaaaak.Portfolio.model.User;
-import com.smaaaak.Portfolio.model.projection.ProfileProjection;
 import com.smaaaak.Portfolio.service.UserService;
 import com.smaaaak.Portfolio.share.JWTUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,26 +23,23 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/user")
+@RequestMapping("api/users")
+@AllArgsConstructor
 public class UserController {
 
-    private UserService userService ;
+    private final UserService userService ;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User newUser){
         return new ResponseEntity<>(this.userService.addNewUser(newUser) , HttpStatus.CREATED) ;
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<User> updateUser(@RequestBody User user){
         return new ResponseEntity<>(this.userService.updateUser(user) , HttpStatus.OK) ;
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long idUser){
         this.userService.deleteUser(idUser); ;
         return new ResponseEntity<>(HttpStatus.OK) ;
@@ -98,7 +96,7 @@ public class UserController {
     }
 
     @GetMapping("/getProfile")
-    public ResponseEntity<ProfileProjection> getProfile(){
+    public ResponseEntity<ProfileDto> getProfile(){
         return new ResponseEntity<>(this.userService.getProfile() , HttpStatus.OK) ;
     }
 

@@ -36,7 +36,7 @@ public class User {
     @JoinColumn(name = "idSocialMedia")
     private SocialMedia socialMedia ;
 
-    @OneToOne
+    @OneToOne(cascade = { CascadeType.PERSIST,CascadeType.REMOVE } )
     @JoinColumn(name="idAccount")
     private Account account ;
 

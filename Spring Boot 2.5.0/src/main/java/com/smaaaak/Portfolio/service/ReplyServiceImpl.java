@@ -4,6 +4,7 @@ import com.smaaaak.Portfolio.Exception.ApiRequestException;
 import com.smaaaak.Portfolio.model.Reply;
 import com.smaaaak.Portfolio.repository.CommentRepository;
 import com.smaaaak.Portfolio.repository.ReplyRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,15 +13,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
 
-    private ReplyRepository replyRepository ;
-    private CommentRepository commentRepository ;
+    private final ReplyRepository replyRepository ;
+    private final CommentRepository commentRepository ;
 
-    public ReplyServiceImpl(ReplyRepository replyRepository, CommentRepository commentRepository) {
-        this.replyRepository = replyRepository;
-        this.commentRepository = commentRepository;
-    }
 
     @Override
     public List<Reply> getAllReplies() {
@@ -35,9 +33,9 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public Reply addNewReply(Reply newReply) {
-        if(!this.commentRepository.findById(newReply.getComment().getIdComment()).isPresent()){
-           throw new ApiRequestException(" comment doesn't exists ") ;
-        }
+        this.commentRepository.findById(newReply.getComment().getIdComment()).orElseThrow(
+                () -> new ApiRequestException(" comment doesn't exists ")
+        );
         return this.replyRepository.save(newReply);
     }
 

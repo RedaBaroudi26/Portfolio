@@ -8,6 +8,7 @@ import com.smaaaak.Portfolio.model.Skill;
 import com.smaaaak.Portfolio.repository.ImageRepository;
 import com.smaaaak.Portfolio.repository.SkillRepository;
 import com.smaaaak.Portfolio.share.ImageUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
@@ -23,18 +24,13 @@ import java.util.List;
 
 
 @Service
+@RequiredArgsConstructor
 public class SkillServiceImpl implements SkillService {
 
-    private SkillRepository skillRepository ;
-    private ServletContext context ;
-    private ImageRepository imageRepository ;
+    private final SkillRepository skillRepository ;
+    private final ServletContext context ;
+    private final ImageRepository imageRepository ;
 
-
-    public SkillServiceImpl(SkillRepository skillRepository, ServletContext context, ImageRepository imageRepository) {
-        this.skillRepository = skillRepository;
-        this.context = context;
-        this.imageRepository = imageRepository;
-    }
 
     @Override
     public List<Skill> allSkills() {
@@ -43,10 +39,9 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public Skill findSkillById(Long idSkill) {
-        if (this.skillRepository.findById(idSkill).isEmpty()){
-            throw new ApiRequestException("Skill Not Found") ;
-        }
-        return this.skillRepository.findById(idSkill).get();
+        return this.skillRepository.findById(idSkill).orElseThrow(
+                () -> new ApiRequestException("Skill Not Found")
+        );
     }
 
     @Override
@@ -63,19 +58,13 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public void updateSkill(Skill updatedSkill) {
-        if( this.skillRepository.findById(updatedSkill.getIdSkill()).isEmpty() ){
-            throw new ApiRequestException(" this skill not found ") ;
-        }
-        updatedSkill.setImage(this.skillRepository.findById(updatedSkill.getIdSkill()).get().getImage());
+        updatedSkill.setImage(findSkillById(updatedSkill.getIdSkill()).getImage());
         this.skillRepository.save(updatedSkill) ;
     }
 
     @Override
     public void deleteSkill(Long idSkill) {
-        if( this.skillRepository.findById(idSkill).isEmpty() ){
-            throw new ApiRequestException(" this skill not found ") ;
-        }
-        this.deleteSkillImage(idSkill);
+        this.deleteSkillImage( findSkillById(idSkill) );
         this.skillRepository.deleteById(idSkill);
     }
 
@@ -90,9 +79,9 @@ public class SkillServiceImpl implements SkillService {
             throw  new ApiRequestException(e.getMessage()) ;
         }
 
-        if( this.skillRepository.findSkillBySkillName(_skill.getSkillName()).isPresent() ){
-            throw new ApiRequestException(" this skill already exist") ;
-        }
+        this.skillRepository.findSkillBySkillName(_skill.getSkillName()).ifPresent(
+                (skill) -> {   throw new ApiRequestException(" this skill already exist") ; }
+        );
 
         String filename = file.getOriginalFilename();
         imageUrl = ( FilenameUtils.getBaseName(filename) + "." + FilenameUtils.getExtension(filename) ).replaceAll("\\s+" , "" ) ;
@@ -113,8 +102,7 @@ public class SkillServiceImpl implements SkillService {
         return _skill ;
     }
 
-    private void deleteSkillImage(Long idSkill){
-        Skill skill = this.skillRepository.findById(idSkill).get() ;
+    private void deleteSkillImage(Skill skill){
         String url = context.getRealPath(ImageUtil.SKILLS + skill.getImage().getImageUrl()) ;
         boolean isExist = new File(url).exists();
         if (isExist) {

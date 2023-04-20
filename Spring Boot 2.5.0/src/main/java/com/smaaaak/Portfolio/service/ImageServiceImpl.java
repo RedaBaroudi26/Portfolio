@@ -10,6 +10,7 @@ import com.smaaaak.Portfolio.repository.ImageRepository;
 import com.smaaaak.Portfolio.repository.ProjectRepository;
 import com.smaaaak.Portfolio.repository.SkillRepository;
 import com.smaaaak.Portfolio.share.ImageUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
@@ -19,61 +20,53 @@ import javax.servlet.ServletContext;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
 
-    private ImageRepository imageRepository ;
-    private ArticleRepository articleRepository ;
-    private ProjectRepository projectRepository ;
-    private ServletContext context ;
+    private final ImageRepository imageRepository ;
+    private final ArticleRepository articleRepository ;
+    private final ProjectRepository projectRepository ;
+    private final ServletContext context ;
+    private final SkillRepository skillRepository ;
 
-    private SkillRepository skillRepository ;
-
-    public ImageServiceImpl(ImageRepository imageRepository, ArticleRepository articleRepository, ProjectRepository projectRepository, ServletContext context, SkillRepository skillRepository) {
-        this.imageRepository = imageRepository;
-        this.articleRepository = articleRepository;
-        this.projectRepository = projectRepository;
-        this.context = context;
-        this.skillRepository = skillRepository;
-    }
 
     @Override
     public byte[] getImage( Long idImage , Long idObject  , String className ) throws Exception{
 
-        Image image = this.imageRepository.findById(idImage).get() ;
+        Image image = this.imageRepository.findById(idImage)
+                .orElseThrow( () -> new ApiRequestException(" image doesn't exists ") ) ;
+
         Article article  ;
         Project project  ;
-        Skill skill  ;
         String imageUrl = "" ;
 
-        if(image == null ){
-            throw new ApiRequestException(" image doesn't exists ") ;
-        }
 
         if(className.equals("Article")){
-            if(!this.articleRepository.findById(idObject).isPresent()){
-                throw new ApiRequestException(" article not found ") ;
-            }
-            article = this.articleRepository.findById(idObject).get() ;
-            imageUrl =  ( ImageUtil.ARTICLES + article.getCategory().getCategoryName() + "/" + article.getTitle() + "/" ).replaceAll("\\s+" , "") ;
+
+            article = this.articleRepository.findById(idObject)
+                    .orElseThrow( () -> new ApiRequestException(" article not found ") ) ;
+
+            imageUrl = ( ImageUtil.ARTICLES + article.getCategory().getCategoryName() + "/" + article.getTitle() + "/" )
+                             .replaceAll("\\s+" , "") ;
+
         }else if(className.equals("Project")){
-            if(!this.projectRepository.findById(idObject).isPresent()){
-                throw new ApiRequestException(" Project not found ") ;
-            }
-            project = this.projectRepository.findById(idObject).get() ;
+
+            project = this.projectRepository.findById(idObject)
+                          .orElseThrow( () ->  new ApiRequestException(" Project not found ")  ) ;
             imageUrl = ( ImageUtil.PROJECTS + project.getProjectName() + "/" ).replaceAll("\\s+" , "") ;
+
         } else if (className.equals("Skill")) {
-            if(!this.skillRepository.findById(idObject).isPresent()){
-                throw new ApiRequestException(" Skill not found ") ;
-            }
-           // skill = this.skillRepository.findById(idObject).get() ;
+
+            this.skillRepository.findById(idObject).orElseThrow( () -> new ApiRequestException(" Skill not found ")) ;
             imageUrl = ImageUtil.SKILLS  ;
+
         }
 
         boolean isExist = new File(context.getRealPath( imageUrl + image.getImageUrl() ) ).exists() ;
+
         if(!isExist){
             throw new ApiRequestException("File not Found");
         }
@@ -84,7 +77,6 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void updateImage(Long idImage , Long idObject , String className , MultipartFile file) {
 
-        Image image = this.imageRepository.findById(idImage).get() ;
         Article article = null ;
         Project project = null ;
         Skill skill = null ;
@@ -92,34 +84,33 @@ public class ImageServiceImpl implements ImageService {
         String imageUrl2 ;
         boolean isExists = false ;
 
-        if(image == null ){
-            throw new ApiRequestException(" image doesn't exists ") ;
-        }
+        Image image = this.imageRepository.findById(idImage).orElseThrow(
+                ()-> new ApiRequestException(" image doesn't exists ")
+        );
 
         if(className.equals("Article")){
 
-            if(!this.articleRepository.findById(idObject).isPresent()){
-                throw new ApiRequestException(" article not found ") ;
-            }
-            article = this.articleRepository.findById(idObject).get() ;
-            url = ( ImageUtil.ARTICLES + article.getCategory().getCategoryName() + "/" + article.getTitle() + "/" ).replaceAll("\\s+" ,"") ;
+            article = this.articleRepository.findById(idObject).orElseThrow(
+                    () -> new ApiRequestException(" article not found ")
+            ) ;
+
+            url = ( ImageUtil.ARTICLES + article.getCategory().getCategoryName() + "/" + article.getTitle() + "/" )
+                     .replaceAll("\\s+" ,"") ;
 
         }else if(className.equals("Project")){
 
-            if(!this.projectRepository.findById(idObject).isPresent()){
-                throw new ApiRequestException(" Project not found ") ;
-            }
+            project = this.projectRepository.findById(idObject).orElseThrow(
+                    () ->  new ApiRequestException(" Project not found ")
+            );
 
-            project = this.projectRepository.findById(idObject).get() ;
             url = ( ImageUtil.PROJECTS + project.getProjectName() + "/" ).replaceAll("\\s+" , "" ) ;
 
         }else if(className.equals("Skill")){
 
-            if(!this.skillRepository.findById(idObject).isPresent()){
-                throw new ApiRequestException(" Skill not found ") ;
-            }
+            skill = this.skillRepository.findById(idObject).orElseThrow(
+                    () -> new ApiRequestException(" Skill not found ")
+            ) ;
 
-            skill = this.skillRepository.findById(idObject).get() ;
             url = ImageUtil.SKILLS  ;
 
         }
@@ -175,5 +166,8 @@ public class ImageServiceImpl implements ImageService {
         this.imageRepository.deleteById(idImage);
 
     }
+
+
+
 
 }

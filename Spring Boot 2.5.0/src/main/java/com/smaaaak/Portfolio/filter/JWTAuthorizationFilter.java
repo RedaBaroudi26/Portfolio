@@ -56,9 +56,6 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
                 }catch(Exception e){
 
-                  //  response.setHeader("message",e.getMessage());
-                  //  response.sendError(HttpServletResponse.SC_FORBIDDEN);
-
                     Map<String, String> error = new HashMap<>();
                     error.put( "message" , e.getMessage() ) ;
                     response.setStatus(HttpStatus.BAD_REQUEST.value());

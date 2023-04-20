@@ -3,13 +3,14 @@ package com.smaaaak.Portfolio.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smaaaak.Portfolio.Exception.ApiRequestException;
-import com.smaaaak.Portfolio.model.Article;
+import com.smaaaak.Portfolio.dto.ProjectDto;
+import com.smaaaak.Portfolio.mapper.MapStructMapper;
 import com.smaaaak.Portfolio.model.Image;
 import com.smaaaak.Portfolio.model.Project;
-import com.smaaaak.Portfolio.model.projection.ProjectProjection;
 import com.smaaaak.Portfolio.repository.ImageRepository;
 import com.smaaaak.Portfolio.repository.ProjectRepository;
 import com.smaaaak.Portfolio.share.ImageUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.domain.Page;
@@ -28,17 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
-    private ProjectRepository projectRepository ;
-    private ImageRepository imageRepository ;
-    private ServletContext context ;
-
-    public ProjectServiceImpl(ProjectRepository projectRepository, ImageRepository imageRepository, ServletContext context) {
-        this.projectRepository = projectRepository;
-        this.imageRepository = imageRepository;
-        this.context = context;
-    }
+    private final ProjectRepository projectRepository ;
+    private final ImageRepository imageRepository ;
+    private final ServletContext context ;
+    private final MapStructMapper mapper ;
 
     @Override
     public List<Project> getAllProjects() {
@@ -52,33 +49,28 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Page<ProjectProjection> getProjectByPageAndProjection(int offset, int size) {
+    public Page<ProjectDto> getProjectByPageAndProjection(int offset, int size) {
         Pageable pageable = PageRequest.of(offset , size) ;
-        return this.projectRepository.getProjectsByPages(pageable);
+        return this.projectRepository.getProjectsByPages(pageable).map(mapper::projectToProjectDto);
     }
 
     @Override
     public Project getProjectByIdProject(Long idProject) {
-        Project project = this.projectRepository.findById(idProject).get() ;
-        if(project == null ){
-            throw new ApiRequestException(" this project doesn't exists ");
-        }
-        return project ;
+        return this.projectRepository.findById(idProject)
+                .orElseThrow(() ->new ApiRequestException(" this project doesn't exists ") );
     }
 
     @Override
     public Project getProjectByName(String projectName) {
-        Project project = this.projectRepository.findProjectByProjectName(projectName).get() ;
-        if(project == null ){
-            throw new ApiRequestException(" this project doesn't exists ");
-        }
-        return project ;
+        return this.projectRepository.findProjectByProjectName(projectName).orElseThrow(
+                () -> new ApiRequestException(" this project doesn't exists ")
+        ) ;
     }
 
     @Override
-    public Page<ProjectProjection> getProjectByWord(String word, int offset, int size) {
+    public Page<ProjectDto> getProjectByWord(String word, int offset, int size) {
         Pageable pageable = PageRequest.of(offset , size) ;
-        return this.projectRepository.getProjectsByWord(word , pageable);
+        return this.projectRepository.getProjectsByWord(word , pageable).map(mapper::projectToProjectDto);
     }
 
     @Override
@@ -95,9 +87,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteProject(Long idProject) {
-        if(!this.projectRepository.findById(idProject).isPresent()){
-            throw new ApiRequestException(" project doesn't exists ") ;
-        }
+        getProjectByIdProject(idProject) ;
         this.deleteDirectory(idProject) ;
         this.projectRepository.deleteById(idProject) ;
     }
@@ -119,11 +109,15 @@ public class ProjectServiceImpl implements ProjectService {
             throw  new ApiRequestException(e.getMessage()) ;
         }
 
-        if(this.projectRepository.findProjectByProjectName(_project.getProjectName()).isPresent()){
+      /*  if(this.projectRepository.findProjectByProjectName(_project.getProjectName()).isPresent()){
             throw new ApiRequestException(" this project Name already exist ") ;
-        }
+        } */
 
-        for(int i= 0 ; i < files.length ; i++ ) {
+        this.projectRepository.findProjectByProjectName(_project.getProjectName()).ifPresent(
+                (project1) -> { throw new ApiRequestException(" this project Name already exist ") ; }
+        );
+
+        for( int i= 0 ; i < files.length ; i++ ) {
 
             String filename = files[i].getOriginalFilename();
             String newFileName = _project.getProjectName() + "/" + FilenameUtils.getBaseName(filename) + "." + FilenameUtils.getExtension(filename);
@@ -164,13 +158,14 @@ public class ProjectServiceImpl implements ProjectService {
             throw  new ApiRequestException(e.getMessage()) ;
         }
 
-        if( this.projectRepository.findById(_project.getIdProject()).isEmpty() ){
-            throw new ApiRequestException(" project doesn't exists ") ;
-        }
+
+        this.projectRepository.findById(_project.getIdProject()).orElseThrow(
+                () -> new ApiRequestException(" project doesn't exists ")
+        ) ;
 
         Project oldestProject = this.projectRepository.findById(_project.getIdProject()).get() ;
 
-        if(! oldestProject.getProjectName().equals(_project.getProjectName())  ){
+        if( !oldestProject.getProjectName().equals(_project.getProjectName())  ){
 
             String url = ( ImageUtil.PROJECTS + oldestProject.getProjectName() + "/" ).replaceAll("\\s+" , "") ;
             String urlUpdated = ( ImageUtil.ARTICLES + _project.getProjectName() + "/").replaceAll("\\s+" , "") ;
@@ -198,13 +193,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     private void deleteDirectory(Long idProject){
 
-        Project project = this.projectRepository.findById(idProject).get() ;
+        Project project = getProjectByIdProject(idProject) ;
         String url = ( ImageUtil.PROJECTS + project.getProjectName() + "/" ).replaceAll("\\s+" , "") ;
         boolean isExist = new File(context.getRealPath(url)).exists() ;
 
         if (isExist) {
 
             File[] files =  new File(context.getRealPath(url)).listFiles() ;
+
             for (File file : files){
                 try {
                     file.delete() ;

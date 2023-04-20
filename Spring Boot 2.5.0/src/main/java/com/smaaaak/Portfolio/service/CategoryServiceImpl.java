@@ -7,6 +7,7 @@ import com.smaaaak.Portfolio.repository.CategoryRepository;
 import com.smaaaak.Portfolio.share.ImageUtil;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,21 +19,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
-    private CategoryRepository categoryRepository ;
-    private ArticleRepository articleRepository ;
-    private ServletContext context ;
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ArticleRepository articleRepository, ServletContext context) {
-        this.categoryRepository = categoryRepository;
-        this.articleRepository = articleRepository;
-        this.context = context;
-    }
+    private final CategoryRepository categoryRepository ;
+    private final ArticleRepository articleRepository ;
+    private final ServletContext context ;
 
     @Override
     public List<Category> getAllCategories() {
@@ -46,15 +41,22 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public Category findCategoryById(Long idCategory) {
+        return this.categoryRepository.findById(idCategory).orElseThrow(
+                () -> new ApiRequestException(" category doesn't exists ")
+        ) ;
+    }
+
+    @Override
     public Long getCategoriesCount() {
         return this.categoryRepository.count() ;
     }
 
     @Override
     public Category addNewCategory(Category newCategory) {
-        if( this.categoryRepository.findCategoryByCategoryName(newCategory.getCategoryName()).isPresent() ){
-            throw new ApiRequestException(" category already exists ") ;
-        }
+        this.categoryRepository.findCategoryByCategoryName(newCategory.getCategoryName()).ifPresent(
+                (category) ->  new ApiRequestException(" category already exists ")
+        );
         this.createCategoryFile(newCategory);
         return this.categoryRepository.save(newCategory);
     }
@@ -62,17 +64,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Category category) {
 
-        Category oldestCategory ;
+        Category oldestCategory = findCategoryById(category.getIdCategory()) ;
 
-        if( !this.categoryRepository.findById(category.getIdCategory()).isPresent() ){
-            throw new ApiRequestException(" category doesn't exists ") ;
-        }
-
-        if( this.categoryRepository.findCategoryByCategoryName(category.getCategoryName()).isPresent() ){
-            throw new ApiRequestException(" category Name already exists ") ;
-        }
-
-        oldestCategory =  this.categoryRepository.findById(category.getIdCategory()).get() ;
+        this.categoryRepository.findCategoryByCategoryName(category.getCategoryName()).ifPresent(
+                category1 -> {  throw new ApiRequestException(" category Name already exists ") ; }
+        );
 
         this.updateFileName(category , oldestCategory.getCategoryName());
 
@@ -81,14 +77,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long idCategory) {
-        if(!this.categoryRepository.findById(idCategory).isPresent()){
-            throw new ApiRequestException(" category doesn't exists ") ;
-        }
-        if(this.articleRepository.existsArticleByCategory_CategoryName(this.categoryRepository.findById(idCategory).get().getCategoryName())){
+
+        Category category = findCategoryById(idCategory) ;
+
+        if( this.articleRepository.existsArticleByCategory_CategoryName(findCategoryById(idCategory).getCategoryName()) ){
             throw new ApiRequestException(" can't delete this category , category still have articles ") ;
         }
 
-        this.deleteCategoryFile(idCategory);
+        this.deleteCategoryFile(category);
         this.categoryRepository.deleteById(idCategory);
     }
 
@@ -115,8 +111,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private void deleteCategoryFile(Long idCategory){
-        Category category = this.categoryRepository.findById(idCategory).get() ;
+    private void deleteCategoryFile(Category category){
         String url = context.getRealPath(ImageUtil.ARTICLES + category.getCategoryName().replaceAll("\\s+" , "") + "/") ;
         boolean isExist = new File(url).exists();
         if (isExist) {

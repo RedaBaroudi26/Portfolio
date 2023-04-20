@@ -5,6 +5,7 @@ package com.smaaaak.Portfolio.Config;
 import com.smaaaak.Portfolio.filter.JWTAuthenticationFilter;
 import com.smaaaak.Portfolio.filter.JWTAuthorizationFilter;
 import com.smaaaak.Portfolio.service.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,14 +23,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private UserDetailsServiceImpl userDetailsService ;
-
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
+    private final UserDetailsServiceImpl userDetailsService ;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -43,10 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable() ;
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) ;
         http.headers().frameOptions().disable();
-        http.authorizeRequests().antMatchers("/api/user/refreshToken").permitAll() ;
-        http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/tag/**" , "/api/category/**" ,"/api/comment/**", "/api/article/**" , "/api/project/**"  , "/api/user/getProfile" , "/api/skill/**" ).permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.POST,"/api/comment/**" , "/api/reply/**" , "/login/**").permitAll();
-        http.authorizeRequests().antMatchers("/api/tag/**" , "/api/category/**" , "/api/article/**" , "/api/role/**" , "/api/comment/**","/api/user/**" ,"/api/skill/**" ).hasAuthority("ADMIN");
+       // http.authorizeRequests().antMatchers("**").permitAll() ;
+        http.authorizeRequests().antMatchers("/api/users/refreshToken").permitAll() ;
+        http.authorizeRequests().antMatchers(HttpMethod.GET,"/api/tags/**" , "/api/categories/**" ,"/api/comments/**", "/api/articles/**" , "/api/projects/**"  , "/api/users/getProfile" , "/api/skills/**" ).permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.POST,"/api/comments/**" , "/api/replies/**" , "/login/**").permitAll();
+        http.authorizeRequests().antMatchers("/api/tags/**" , "/api/categories/**" , "/api/articles/**" , "/api/roles/**" , "api/users/**", "/api/comments/**" ,"/api/skills/**" ).hasAuthority("ADMIN");
         http.authorizeRequests().anyRequest().authenticated() ;
         http.addFilter(new JWTAuthenticationFilter(authenticationManager()));
         http.addFilterBefore(new JWTAuthorizationFilter() , UsernamePasswordAuthenticationFilter.class);
@@ -58,7 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration( "http://localhost:4200", new CorsConfiguration().applyPermitDefaultValues()) ;
        // source.registerCorsConfiguration( "https://smaaaktest.web.app", new CorsConfiguration().applyPermitDefaultValues()) ;
-        // source.registerCorsConfiguration( "https://Smaaaak-v1.web.app", new CorsConfiguration().applyPermitDefaultValues()) ;
+       // source.registerCorsConfiguration( "https://Smaaaak-v1.web.app", new CorsConfiguration().applyPermitDefaultValues()) ;
         return source;
     }
 

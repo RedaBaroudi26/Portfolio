@@ -5,6 +5,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smaaaak.Portfolio.share.JWTUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,13 +25,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
+@RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private AuthenticationManager authenticationManager ;
-
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
+    private final AuthenticationManager authenticationManager ;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -39,7 +37,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String password = request.getParameter("password");
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email , password);
-
         return authenticationManager.authenticate(authenticationToken);
     }
 
@@ -53,7 +50,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + JWTUtil.EXPIRE_ACCESS_TOKEN ))
                 .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles",user.getAuthorities().stream().map(ga -> ga.getAuthority()).collect(Collectors.toList()))
+                .withClaim("roles" , user.getAuthorities().stream().map(ga -> ga.getAuthority()).collect(Collectors.toList()))
                 .sign(algorithm);
 
         String refreshToken = JWT.create()

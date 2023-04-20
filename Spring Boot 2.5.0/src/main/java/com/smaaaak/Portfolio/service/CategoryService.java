@@ -11,6 +11,8 @@ public interface CategoryService {
 
     Page<Category> getCategoriesByPage(int offset , int size) ;
 
+    Category findCategoryById(Long idCategory) ;
+
     Long getCategoriesCount() ;
 
     Category addNewCategory(Category newCategory) ;

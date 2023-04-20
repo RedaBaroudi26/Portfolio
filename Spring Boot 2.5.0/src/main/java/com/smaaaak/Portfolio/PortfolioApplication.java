@@ -1,6 +1,12 @@
 package com.smaaaak.Portfolio;
 
 
+import com.smaaaak.Portfolio.model.Role;
+import com.smaaaak.Portfolio.model.SocialMedia;
+import com.smaaaak.Portfolio.model.projection.SocialMediaProjection;
+import com.smaaaak.Portfolio.repository.RoleRepository;
+import com.smaaaak.Portfolio.repository.SocialMediaRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +19,11 @@ import java.util.Arrays;
 
 @SpringBootApplication
 public class PortfolioApplication {
+	private final SocialMediaRepository socialMediaRepository;
+
+	public PortfolioApplication(SocialMediaRepository socialMediaRepository) {
+		this.socialMediaRepository = socialMediaRepository;
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(PortfolioApplication.class, args);
@@ -38,6 +49,15 @@ public class PortfolioApplication {
 		urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
 		return new CorsFilter(urlBasedCorsConfigurationSource);
 	}
+
+	/*
+	@Bean
+	CommandLineRunner run( ){
+		return args -> {
+		} ;
+	}
+	 */
+
 
 
 }

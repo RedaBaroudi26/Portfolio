@@ -12,10 +12,10 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("select p from Project p")
-    Page<ProjectProjection> getProjectsByPages(Pageable pageable) ;
+    Page<Project> getProjectsByPages(Pageable pageable) ;
 
     @Query("select p from Project p where p.description like CONCAT('%', :word , '%') or p.content like CONCAT('%', :word , '%') or p.projectName like CONCAT('%', :word , '%')  ")
-    Page<ProjectProjection> getProjectsByWord(String word , Pageable pageable) ;
+    Page<Project> getProjectsByWord(String word , Pageable pageable) ;
 
     Optional<Project> findProjectByProjectName(String projectName) ;
 
